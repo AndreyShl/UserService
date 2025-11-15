@@ -21,7 +21,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U user_service_user"
+          --health-cmd="pg_isready -U user_service_user -d UserService"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
@@ -30,6 +30,11 @@ jobs:
         image: redis:7
         ports:
           - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
 
     steps:
       - name: Checkout repository
@@ -42,6 +47,19 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          echo "Waiting for PostgreSQL..."
+          until pg_isready -h localhost -U user_service_user -d UserService; do
+            sleep 5
+          done
+
+      - name: Wait for Redis to be ready
+        run: |
+          echo "Waiting for Redis..."
+          until redis-cli -h localhost ping | grep PONG; do
+            sleep 5
+          done
 
       - name: Build with Maven
         run: mvn -B clean verify
