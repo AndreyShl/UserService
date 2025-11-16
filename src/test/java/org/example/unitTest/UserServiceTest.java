@@ -96,7 +96,8 @@ public class UserServiceTest {
         updatedDTO.setActive(false);
 
         when(usersRepository.findById(1)).thenReturn(Optional.of(user));
-        when(mapper.toDTO(user)).thenReturn(updatedDTO);
+        when(usersRepository.save(eq(user))).thenReturn(user);
+        when(mapper.toDTO(eq(user))).thenReturn(updatedDTO);
 
         Userdto result = userService.updateUserByID(1, updatedDTO);
 
@@ -136,6 +137,6 @@ public class UserServiceTest {
         Page<Userdto> result = userService.getUsers("Andrei", "Andreev", Pageable.unpaged());
 
         assertEquals(1, result.getTotalElements());
-        assertEquals("Andrei", result.getContent().get(0).getName());
+        assertEquals("Andrei", result.getContent().getFirst().getName());
     }
 }
