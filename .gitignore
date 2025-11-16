@@ -33,3 +33,5 @@ pgdata_app/
 
 ### VS Code ###
 .vscode/
+
+.env

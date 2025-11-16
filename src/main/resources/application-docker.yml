@@ -2,9 +2,9 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://postgres:5432/UserService
-    username: user_service_user
-    password: password
+    url: ${APP_DB_URL}
+    username: ${APP_DB_USERNAME}
+    password: ${APP_DB_PASSWORD}
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.xml
 
