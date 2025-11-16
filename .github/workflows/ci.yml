@@ -76,7 +76,7 @@ jobs:
           projectBaseDir: ./
           args: >
             -Dsonar.projectKey=AndreyShl_InnowiseTrainee   
-            -Dsonar.organization=AndreiShlapkov      
+            -Dsonar.organization=andreyshl      
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
