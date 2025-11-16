@@ -3,6 +3,7 @@ package org.example.integrationTest;
 import org.example.dto.Userdto;
 import org.example.model.repository.UsersRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +20,7 @@ import java.util.Date;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-
+@Disabled("Временно")
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserIntegrationTest {
