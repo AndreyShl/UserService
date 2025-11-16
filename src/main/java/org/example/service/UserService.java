@@ -1,8 +1,8 @@
 package org.example.service;
 
 
-import org.example.DTO.UserDTO;
-import org.example.Mapper.UserMapper;
+import org.example.dto.Userdto;
+import org.example.mapper.UserMapper;
 import org.example.exception.UserNotFoundException;
 import org.example.model.entity.User;
 import org.example.model.repository.UsersRepository;
@@ -33,20 +33,20 @@ public class UserService {
             @CacheEvict(value = "users", key = "#result.id"),
             @CacheEvict(value = "usersWithCards", allEntries = true)
     })
-    public UserDTO createUser(UserDTO userDTO) {
+    public Userdto createUser(Userdto userDTO) {
         User user = mapper.toEntity(userDTO);
         usersRepository.save(user);
         return mapper.toDTO(user);
     }
 
     @Cacheable(value = "users", key = "#id")
-    public UserDTO getUserById(Integer id) {
+    public Userdto getUserById(Integer id) {
         User user = usersRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
         return mapper.toDTO(user);
     }
 
-    public Page<UserDTO> getAllUsers(Pageable pageable, Specification<User> spec) {
+    public Page<Userdto> getAllUsers(Pageable pageable, Specification<User> spec) {
         return usersRepository.findAll(spec, pageable).map(mapper::toDTO);
     }
 
@@ -55,7 +55,7 @@ public class UserService {
             @CacheEvict(value = "users", key = "#id"),
             @CacheEvict(value = "usersWithCards", key = "#id")
     })
-    public UserDTO updateUserByID(Integer id, UserDTO updatedDTO) {
+    public Userdto updateUserByID(Integer id, Userdto updatedDTO) {
         User user = usersRepository.findById(id)
                 .orElseThrow(() ->  new UserNotFoundException(id));
 
@@ -65,7 +65,7 @@ public class UserService {
 
         return mapper.toDTO(user);
     }
-    public Page<UserDTO> getUsers(String firstName, String lastName, Pageable pageable) {
+    public Page<Userdto> getUsers(String firstName, String lastName, Pageable pageable) {
         Specification<User> spec = Specification
                 .where(UserSpecification.firstNameContains(firstName))
                 .and(UserSpecification.lastNameContains(lastName));

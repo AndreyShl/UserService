@@ -1,8 +1,8 @@
 package org.example.unitTest;
 
 
-import org.example.DTO.PaymentCardDTO;
-import org.example.Mapper.PaymentCardMapper;
+import org.example.dto.PaymentCarddto;
+import org.example.mapper.PaymentCardMapper;
 import org.example.exception.CardLimitExceededException;
 import org.example.exception.CardNotFoundException;
 import org.example.exception.UserNotFoundException;
@@ -41,7 +41,7 @@ class PaymentCardServiceTest {
 
     private User user;
     private PaymentCard card;
-    private PaymentCardDTO cardDTO;
+    private PaymentCarddto cardDTO;
 
     @BeforeEach
     void setUp() {
@@ -51,7 +51,7 @@ class PaymentCardServiceTest {
         user.setId(1);
         user.setName("Andrei");
 
-        cardDTO = new PaymentCardDTO();
+        cardDTO = new PaymentCarddto();
         cardDTO.setId(1);
         cardDTO.setUserId(user.getId());
         cardDTO.setCardNumber("1234567812345678");
@@ -77,7 +77,7 @@ class PaymentCardServiceTest {
         when(cardRepository.save(card)).thenReturn(card);
         when(mapper.toDTO(card)).thenReturn(cardDTO);
 
-        PaymentCardDTO result = cardService.createCard(cardDTO);
+        PaymentCarddto result = cardService.createCard(cardDTO);
 
         assertEquals(cardDTO.getId(), result.getId());
         assertTrue(result.getActive());
@@ -105,7 +105,7 @@ class PaymentCardServiceTest {
         when(cardRepository.findById(1)).thenReturn(Optional.of(card));
         when(mapper.toDTO(card)).thenReturn(cardDTO);
 
-        PaymentCardDTO result = cardService.getCardById(1);
+        PaymentCarddto result = cardService.getCardById(1);
 
         assertEquals(cardDTO.getId(), result.getId());
     }
@@ -121,7 +121,7 @@ class PaymentCardServiceTest {
         when(cardRepository.findByUserId(user.getId())).thenReturn(List.of(card));
         when(mapper.toDTO(card)).thenReturn(cardDTO);
 
-        List<PaymentCardDTO> cards = cardService.getCardsByUser(user.getId());
+        List<PaymentCarddto> cards = cardService.getCardsByUser(user.getId());
 
         assertEquals(1, cards.size());
         assertEquals(cardDTO.getId(), cards.get(0).getId());
@@ -129,7 +129,7 @@ class PaymentCardServiceTest {
 
     @Test
     void updateCard_success() {
-        PaymentCardDTO updatedDTO = new PaymentCardDTO();
+        PaymentCarddto updatedDTO = new PaymentCarddto();
         updatedDTO.setId(1);
         updatedDTO.setUserId(user.getId());
         updatedDTO.setCardNumber("9999888877776666");
@@ -141,7 +141,7 @@ class PaymentCardServiceTest {
         when(cardRepository.save(card)).thenReturn(card);
         when(mapper.toDTO(card)).thenReturn(updatedDTO);
 
-        PaymentCardDTO result = cardService.updateCard(1, updatedDTO);
+        PaymentCarddto result = cardService.updateCard(1, updatedDTO);
 
         assertEquals("9999888877776666", result.getCardNumber());
         assertFalse(result.getActive());

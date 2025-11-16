@@ -1,4 +1,4 @@
-package org.example.DTO;
+package org.example.dto;
 
 
 import jakarta.validation.constraints.Email;
@@ -11,7 +11,7 @@ import java.util.Date;
 
 
 @Data
-public class UserDTO {
+public class Userdto {
 
     private Integer id;
 

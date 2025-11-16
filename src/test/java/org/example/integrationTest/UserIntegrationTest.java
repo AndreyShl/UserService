@@ -1,6 +1,6 @@
 package org.example.integrationTest;
 
-import org.example.DTO.UserDTO;
+import org.example.dto.Userdto;
 import org.example.model.repository.UsersRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,23 +49,23 @@ public class UserIntegrationTest {
 
     @Test
     void userFullFlowIntegrationTest() {
-        UserDTO userDTO = new UserDTO();
+        Userdto userDTO = new Userdto();
         userDTO.setName("Alex");
         userDTO.setSurname("Maxov");
         userDTO.setBirthDate(new Date());
         userDTO.setEmail("alex.maxov@example.com");
         userDTO.setActive(true);
 
-        ResponseEntity<UserDTO> createResponse = restTemplate.postForEntity(
-                baseUrl + "/users", userDTO, UserDTO.class
+        ResponseEntity<Userdto> createResponse = restTemplate.postForEntity(
+                baseUrl + "/users", userDTO, Userdto.class
         );
         assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        UserDTO createdUser = createResponse.getBody();
+        Userdto createdUser = createResponse.getBody();
         assertThat(createdUser.getId()).isNotNull();
         Integer userId = createdUser.getId();
 
-        ResponseEntity<UserDTO> getResponse = restTemplate.getForEntity(
-                baseUrl + "/users/" + userId, UserDTO.class
+        ResponseEntity<Userdto> getResponse = restTemplate.getForEntity(
+                baseUrl + "/users/" + userId, Userdto.class
         );
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(getResponse.getBody().getEmail()).isEqualTo("alex.maxov@example.com");
@@ -75,13 +75,13 @@ public class UserIntegrationTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<UserDTO> updateRequest = new HttpEntity<>(createdUser, headers);
+        HttpEntity<Userdto> updateRequest = new HttpEntity<>(createdUser, headers);
 
-        ResponseEntity<UserDTO> updateResponse = restTemplate.exchange(
+        ResponseEntity<Userdto> updateResponse = restTemplate.exchange(
                 baseUrl + "/users/" + userId,
                 HttpMethod.PUT,
                 updateRequest,
-                UserDTO.class
+                Userdto.class
         );
         assertThat(updateResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(updateResponse.getBody().getName()).isEqualTo("Alexander");
@@ -96,8 +96,8 @@ public class UserIntegrationTest {
         assertThat(activateResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         // Проверка, что пользователь активен
-        ResponseEntity<UserDTO> checkActivated = restTemplate.getForEntity(
-                baseUrl + "/users/" + userId, UserDTO.class
+        ResponseEntity<Userdto> checkActivated = restTemplate.getForEntity(
+                baseUrl + "/users/" + userId, Userdto.class
         );
         assertThat(checkActivated.getBody().isActive()).isTrue();
 
@@ -111,8 +111,8 @@ public class UserIntegrationTest {
         assertThat(deactivateResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
 
-        ResponseEntity<UserDTO> checkDeactivated = restTemplate.getForEntity(
-                baseUrl + "/users/" + userId, UserDTO.class
+        ResponseEntity<Userdto> checkDeactivated = restTemplate.getForEntity(
+                baseUrl + "/users/" + userId, Userdto.class
         );
         assertThat(checkDeactivated.getBody().isActive()).isFalse();
     }

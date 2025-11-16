@@ -1,7 +1,7 @@
 package org.example.service;
 
-import org.example.DTO.PaymentCardDTO;
-import org.example.Mapper.PaymentCardMapper;
+import org.example.dto.PaymentCarddto;
+import org.example.mapper.PaymentCardMapper;
 import org.example.exception.CardLimitExceededException;
 import org.example.exception.CardNotFoundException;
 import org.example.exception.UserNotFoundException;
@@ -33,7 +33,7 @@ public class PaymentCardService {
 
     @Transactional
     @CacheEvict(value = "cards", key = "#cardDTO.userId")
-    public PaymentCardDTO createCard(PaymentCardDTO cardDTO) {
+    public PaymentCarddto createCard(PaymentCarddto cardDTO) {
         Integer userId = cardDTO.getUserId();
 
         int count = cardRepository.countByUserId(userId);
@@ -51,13 +51,13 @@ public class PaymentCardService {
         return mapper.toDTO(cardRepository.save(card));
     }
     @Cacheable(value = "cards", key = "#id")
-    public PaymentCardDTO getCardById(Integer id) {
+    public PaymentCarddto getCardById(Integer id) {
         PaymentCard card = cardRepository.findById(id)
                 .orElseThrow(() -> new CardNotFoundException(id));
         return mapper.toDTO(card);
     }
     @Cacheable(value = "cards", key = "#userId")
-    public List<PaymentCardDTO> getCardsByUser(Integer userId) {
+    public List<PaymentCarddto> getCardsByUser(Integer userId) {
         return cardRepository.findByUserId(userId)
                 .stream()
                 .map(mapper::toDTO)
@@ -66,7 +66,7 @@ public class PaymentCardService {
 
     @Transactional
     @CacheEvict(value = "cards", key = "#updatedDTO.userId")
-    public PaymentCardDTO updateCard(Integer id, PaymentCardDTO updatedDTO) {
+    public PaymentCarddto updateCard(Integer id, PaymentCarddto updatedDTO) {
         PaymentCard card = cardRepository.findById(id)
                 .orElseThrow(() -> new CardNotFoundException(id));
 

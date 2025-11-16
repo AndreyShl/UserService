@@ -1,7 +1,7 @@
 package org.example.integrationTest;
 
-import org.example.DTO.UserDTO;
-import org.example.DTO.PaymentCardDTO;
+import org.example.dto.PaymentCarddto;
+import org.example.dto.Userdto;
 import org.example.model.repository.UsersRepository;
 import org.example.model.repository.PaymentCardsRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,49 +58,49 @@ public class PaymentCardIntegrationTest {
     void fullPaymentCardFlowIntegrationTest() {
 
 
-        UserDTO userDTO = new UserDTO();
+        Userdto userDTO = new Userdto();
         userDTO.setName("Alex");
         userDTO.setSurname("Maxov");
         userDTO.setBirthDate(new Date());
         userDTO.setEmail("Alexmaxov@gmail.com");
         userDTO.setActive(true);
 
-        ResponseEntity<UserDTO> userResponse = restTemplate.postForEntity(
-                baseUrl + "/users", userDTO, UserDTO.class
+        ResponseEntity<Userdto> userResponse = restTemplate.postForEntity(
+                baseUrl + "/users", userDTO, Userdto.class
         );
 
         assertThat(userResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         Integer userId = userResponse.getBody().getId();
 
 
-        PaymentCardDTO cardDTO = new PaymentCardDTO();
+        PaymentCarddto cardDTO = new PaymentCarddto();
         cardDTO.setUserId(userId);
         cardDTO.setCardNumber("2222555588885555");
         cardDTO.setHolder("Alex Maxov");
         cardDTO.setExpirationDate(LocalDateTime.now().plusYears(3));
         cardDTO.setActive(true);
 
-        ResponseEntity<PaymentCardDTO> cardResponse = restTemplate.postForEntity(
-                baseUrl + "/cards", cardDTO, PaymentCardDTO.class
+        ResponseEntity<PaymentCarddto> cardResponse = restTemplate.postForEntity(
+                baseUrl + "/cards", cardDTO, PaymentCarddto.class
         );
 
         assertThat(cardResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        PaymentCardDTO createdCard = cardResponse.getBody();
+        PaymentCarddto createdCard = cardResponse.getBody();
         assertThat(createdCard.getUserId()).isEqualTo(userId);
 
 
-        ResponseEntity<PaymentCardDTO[]> cardsByUserResponse = restTemplate.getForEntity(
-                baseUrl + "/cards/user/" + userId, PaymentCardDTO[].class
+        ResponseEntity<PaymentCarddto[]> cardsByUserResponse = restTemplate.getForEntity(
+                baseUrl + "/cards/user/" + userId, PaymentCarddto[].class
         );
 
         assertThat(cardsByUserResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        List<PaymentCardDTO> cards = List.of(cardsByUserResponse.getBody());
+        List<PaymentCarddto> cards = List.of(cardsByUserResponse.getBody());
         assertThat(cards).hasSize(1);
         assertThat(cards.get(0).getCardNumber()).isEqualTo("2222555588885555");
 
 
 
-        PaymentCardDTO updateDTO = new PaymentCardDTO();
+        PaymentCarddto updateDTO = new PaymentCarddto();
         updateDTO.setCardNumber("5555666677778888");
         updateDTO.setHolder("Alex Updated");
         updateDTO.setExpirationDate(LocalDateTime.now().plusYears(5));
@@ -109,13 +109,13 @@ public class PaymentCardIntegrationTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<PaymentCardDTO> updateRequest = new HttpEntity<>(updateDTO, headers);
+        HttpEntity<PaymentCarddto> updateRequest = new HttpEntity<>(updateDTO, headers);
 
-        ResponseEntity<PaymentCardDTO> updatedResponse = restTemplate.exchange(
+        ResponseEntity<PaymentCarddto> updatedResponse = restTemplate.exchange(
                 baseUrl + "/cards/" + createdCard.getId(),
                 HttpMethod.PUT,
                 updateRequest,
-                PaymentCardDTO.class
+                PaymentCarddto.class
         );
 
         assertThat(updatedResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -132,9 +132,9 @@ public class PaymentCardIntegrationTest {
         assertThat(deactivateResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
 
-        ResponseEntity<PaymentCardDTO> getDeactivatedResponse = restTemplate.getForEntity(
+        ResponseEntity<PaymentCarddto> getDeactivatedResponse = restTemplate.getForEntity(
                 baseUrl + "/cards/" + createdCard.getId(),
-                PaymentCardDTO.class
+                PaymentCarddto.class
         );
         assertThat(getDeactivatedResponse.getBody().getActive()).isFalse();
     }

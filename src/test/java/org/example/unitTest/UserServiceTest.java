@@ -1,7 +1,7 @@
 package org.example.unitTest;
 
-import org.example.DTO.UserDTO;
-import org.example.Mapper.UserMapper;
+import org.example.dto.Userdto;
+import org.example.mapper.UserMapper;
 import org.example.exception.UserNotFoundException;
 import org.example.model.entity.User;
 import org.example.model.repository.UsersRepository;
@@ -38,7 +38,7 @@ public class UserServiceTest {
     private UserService userService;
 
     private User user;
-    private UserDTO userDTO;
+    private Userdto userDTO;
 
     @BeforeEach
     void setUp() {
@@ -48,7 +48,7 @@ public class UserServiceTest {
         user.setSurname("Andreev");
         user.setActive(true);
 
-        userDTO = new UserDTO();
+        userDTO = new Userdto();
         userDTO.setId(1);
         userDTO.setName("Andrei");
         userDTO.setSurname("Andreev");
@@ -62,7 +62,7 @@ public class UserServiceTest {
         when(usersRepository.save(user)).thenReturn(user);
         when(mapper.toDTO(user)).thenReturn(userDTO);
 
-        UserDTO result = userService.createUser(userDTO);
+        Userdto result = userService.createUser(userDTO);
 
         assertEquals(userDTO.getName(), result.getName());
         assertEquals(userDTO.getSurname(), result.getSurname());
@@ -75,7 +75,7 @@ public class UserServiceTest {
         when(usersRepository.findById(1)).thenReturn(Optional.of(user));
         when(mapper.toDTO(user)).thenReturn(userDTO);
 
-        UserDTO result = userService.getUserById(1);
+        Userdto result = userService.getUserById(1);
 
         assertNotNull(result);
         assertEquals("Andrei", result.getName());
@@ -90,7 +90,7 @@ public class UserServiceTest {
 
     @Test
     void updateUserByID_success() {
-        UserDTO updatedDTO = new UserDTO();
+        Userdto updatedDTO = new Userdto();
         updatedDTO.setName("NewName");
         updatedDTO.setSurname("NewSurname");
         updatedDTO.setActive(false);
@@ -98,7 +98,7 @@ public class UserServiceTest {
         when(usersRepository.findById(1)).thenReturn(Optional.of(user));
         when(mapper.toDTO(user)).thenReturn(updatedDTO);
 
-        UserDTO result = userService.updateUserByID(1, updatedDTO);
+        Userdto result = userService.updateUserByID(1, updatedDTO);
 
         assertEquals("NewName", result.getName());
         assertEquals("NewSurname", result.getSurname());
@@ -133,7 +133,7 @@ public class UserServiceTest {
         when(usersRepository.findAll(ArgumentMatchers.<Specification<User>>any(), any(Pageable.class))).thenReturn(page);
         when(mapper.toDTO(user)).thenReturn(userDTO);
 
-        Page<UserDTO> result = userService.getUsers("Andrei", "Andreev", Pageable.unpaged());
+        Page<Userdto> result = userService.getUsers("Andrei", "Andreev", Pageable.unpaged());
 
         assertEquals(1, result.getTotalElements());
         assertEquals("Andrei", result.getContent().get(0).getName());
