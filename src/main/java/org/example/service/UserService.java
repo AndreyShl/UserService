@@ -1,6 +1,7 @@
 package org.example.service;
 
 
+import lombok.RequiredArgsConstructor;
 import org.example.dto.Userdto;
 import org.example.mapper.UserMapper;
 import org.example.exception.UserNotFoundException;
@@ -9,6 +10,7 @@ import org.example.model.repository.UsersRepository;
 
 import org.example.specification.UserSpecification;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
@@ -19,18 +21,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UsersRepository usersRepository;
     private final UserMapper mapper;
 
-    public UserService(UsersRepository usersRepository, UserMapper mapper) {
-        this.usersRepository = usersRepository;
-        this.mapper = mapper;
-    }
 
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(value = "users", key = "#result.id"),
+    @Caching(put = {
+            @CachePut(value = "users", key = "#result.id"),
+
+    }, evict = {
             @CacheEvict(value = "usersWithCards", allEntries = true)
     })
     public Userdto createUser(Userdto userDTO) {
@@ -51,19 +52,18 @@ public class UserService {
     }
 
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(value = "users", key = "#id"),
-            @CacheEvict(value = "usersWithCards", key = "#id")
-    })
+    @Caching(
+            put = { @CachePut(value = "users", key = "#id") },
+            evict = { @CacheEvict(value = "usersWithCards", allEntries = true) }
+    )
     public Userdto updateUserByID(Integer id, Userdto updatedDTO) {
         User user = usersRepository.findById(id)
                 .orElseThrow(() ->  new UserNotFoundException(id));
 
-        user.setName(updatedDTO.getName());
-        user.setSurname(updatedDTO.getSurname());
-        user.setActive(updatedDTO.isActive());
+        mapper.updateUserFromDto(updatedDTO, user);
+        User updatedUser = usersRepository.save(user);
 
-        return mapper.toDTO(user);
+        return mapper.toDTO(updatedUser);
     }
     public Page<Userdto> getUsers(String firstName, String lastName, Pageable pageable) {
         Specification<User> spec = Specification
@@ -79,24 +79,26 @@ public class UserService {
 
 
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(value = "users", key = "#id"),
-            @CacheEvict(value = "usersWithCards", key = "#id")
-    })
+    @Caching(
+            put = { @CachePut(value = "users", key = "#id") },
+            evict = { @CacheEvict(value = "usersWithCards", allEntries = true) }
+    )
     public void activateUser(Integer id) {
         User user = usersRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
         user.setActive(true);
+        usersRepository.save(user);
     }
 
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(value = "users", key = "#id"),
-            @CacheEvict(value = "usersWithCards", key = "#id")
-    })
+    @Caching(
+            put = { @CachePut(value = "users", key = "#id") },
+            evict = { @CacheEvict(value = "usersWithCards", allEntries = true) }
+    )
     public void deactivateUser(Integer id) {
         User user = usersRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
         user.setActive(false);
+        usersRepository.save(user);
     }
 }

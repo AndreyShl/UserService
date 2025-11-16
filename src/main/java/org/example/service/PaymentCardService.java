@@ -1,5 +1,6 @@
 package org.example.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.dto.PaymentCarddto;
 import org.example.mapper.PaymentCardMapper;
 import org.example.exception.CardLimitExceededException;
@@ -10,7 +11,9 @@ import org.example.model.entity.User;
 import org.example.model.repository.PaymentCardsRepository;
 import org.example.model.repository.UsersRepository;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,26 +21,25 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PaymentCardService {
 
     private final PaymentCardsRepository cardRepository;
     private final UsersRepository userRepository;
     private final PaymentCardMapper mapper;
+    private static final int MAX_CARDS_PER_USER = 5;
 
-    public PaymentCardService(PaymentCardsRepository cardRepository,
-                              UsersRepository userRepository, PaymentCardMapper mapper) {
-        this.cardRepository = cardRepository;
-        this.userRepository = userRepository;
-        this.mapper = mapper;
-    }
 
     @Transactional
-    @CacheEvict(value = "cards", key = "#cardDTO.userId")
+    @Caching(
+            put = { @CachePut(value = "cardById", key = "#result.id") },
+            evict = { @CacheEvict(value = "cardsByUserId", key = "#cardDTO.userId") }
+    )
     public PaymentCarddto createCard(PaymentCarddto cardDTO) {
         Integer userId = cardDTO.getUserId();
 
         int count = cardRepository.countByUserId(userId);
-        if (count >= 5) {
+        if (count >= MAX_CARDS_PER_USER) {
             throw new CardLimitExceededException(userId);
         }
 
@@ -50,13 +52,13 @@ public class PaymentCardService {
 
         return mapper.toDTO(cardRepository.save(card));
     }
-    @Cacheable(value = "cards", key = "#id")
+    @Cacheable(value = "cardById", key = "#id")
     public PaymentCarddto getCardById(Integer id) {
         PaymentCard card = cardRepository.findById(id)
                 .orElseThrow(() -> new CardNotFoundException(id));
         return mapper.toDTO(card);
     }
-    @Cacheable(value = "cards", key = "#userId")
+    @Cacheable(value = "cardsByUserId", key = "#userId")
     public List<PaymentCarddto> getCardsByUser(Integer userId) {
         return cardRepository.findByUserId(userId)
                 .stream()
@@ -65,34 +67,43 @@ public class PaymentCardService {
     }
 
     @Transactional
-    @CacheEvict(value = "cards", key = "#updatedDTO.userId")
+    @Caching(
+            put = { @CachePut(value = "cardById",key = "#id")},
+            evict = {@CacheEvict(value = "cardsByUserId",key = "#updatedDTO.userId")}
+    )
     public PaymentCarddto updateCard(Integer id, PaymentCarddto updatedDTO) {
         PaymentCard card = cardRepository.findById(id)
                 .orElseThrow(() -> new CardNotFoundException(id));
 
-        card.setCardNumber(updatedDTO.getCardNumber());
-        card.setHolder(updatedDTO.getHolder());
-        card.setExpirationDate(updatedDTO.getExpirationDate());
-        card.setActive(updatedDTO.getActive());
+        mapper.updateCardFromDTO(updatedDTO, card);
+        PaymentCard updatedCard = cardRepository.save(card);
 
-        return mapper.toDTO(cardRepository.save(card));
+        return mapper.toDTO(updatedCard);
     }
 
     @Transactional
-    @CacheEvict(value = "cards", key = "#id")
+    @Caching(
+            put = {@CachePut(value = "cardById",key = "#id")},
+            evict = {@CacheEvict(value = "cardsByUserId",key = "#card.user.id")}
+    )
     public void activateCard(Integer id) {
         PaymentCard card = cardRepository.findById(id)
                 .orElseThrow(() -> new CardNotFoundException(id));
         card.setActive(true);
+        cardRepository.save(card);
     }
 
 
     @Transactional
-    @CacheEvict(value = "cards", key = "#id")
+    @Caching(
+            put = {@CachePut(value = "cardById",key = "#id")},
+            evict = {@CacheEvict(value = "cardsByUserId",key = "#card.user.id")}
+    )
     public void deactivateCard(Integer id) {
         PaymentCard card = cardRepository.findById(id)
                 .orElseThrow(() -> new CardNotFoundException(id));
         card.setActive(false);
+        cardRepository.save(card);
     }
 
 }
