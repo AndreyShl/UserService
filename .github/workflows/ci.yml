@@ -58,10 +58,11 @@ jobs:
 
 
       - name: SonarQube Scan
-        run: mvn sonar:sonar 
-          -Dsonar.projectKey=AndreyShl_InnowiseTrainee 
-          -Dsonar.organization=andreyshl 
-          -Dsonar.host.url=https://sonarcloud.io 
+        run: |
+          mvn clean verify sonar:sonar \
+          -Dsonar.projectKey=AndreyShl_InnowiseTrainee \
+          -Dsonar.organization=andreyshl \
+          -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
       - name: Set up Docker Buildx
