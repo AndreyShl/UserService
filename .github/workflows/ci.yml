@@ -80,4 +80,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: andrei_shlapkov/userservice:latest
+          tags: andreishlapkov/userservice:latest
