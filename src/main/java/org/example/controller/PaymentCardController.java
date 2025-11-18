@@ -4,6 +4,7 @@ package org.example.controller;
 import jakarta.validation.Valid;
 import org.example.dto.PaymentCarddto;
 import org.example.service.PaymentCardService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -28,11 +29,19 @@ public class PaymentCardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<PaymentCarddto> getCardById(@PathVariable Integer id) {
         PaymentCarddto card = cardService.getCardById(id);
         return ResponseEntity.ok(card);
+    }
+    @GetMapping
+    public ResponseEntity<Page<PaymentCarddto>> getAllCards(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String surname
+    ) {
+        return ResponseEntity.ok(cardService.getAllCards(page, size, name, surname));
     }
 
     @GetMapping("/user/{userId}")

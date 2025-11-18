@@ -3,6 +3,7 @@ package org.example.model.repository;
 import org.example.model.entity.PaymentCard;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +12,7 @@ import java.util.Optional;
 // - JPA provides
 // - findById(ID id)
 @Repository
-public interface PaymentCardsRepository extends JpaRepository<PaymentCard,Integer> {
+public interface PaymentCardsRepository extends JpaRepository<PaymentCard,Integer>, JpaSpecificationExecutor<PaymentCard> {
 
     List<PaymentCard> findByUserId(Integer userId);
 

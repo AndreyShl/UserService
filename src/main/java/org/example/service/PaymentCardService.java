@@ -10,10 +10,15 @@ import org.example.model.entity.PaymentCard;
 import org.example.model.entity.User;
 import org.example.model.repository.PaymentCardsRepository;
 import org.example.model.repository.UsersRepository;
+import org.example.specification.PaymentCardSpecification;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,6 +84,17 @@ public class PaymentCardService {
         PaymentCard updatedCard = cardRepository.save(card);
 
         return mapper.toDTO(updatedCard);
+    }
+
+    public Page<PaymentCarddto> getAllCards(int page, int size, String name, String surname) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Specification<PaymentCard> spec = Specification
+                .where(PaymentCardSpecification.userNameContains(name))
+                .and(PaymentCardSpecification.userSurnameContains(surname));
+
+        return cardRepository.findAll(spec, pageable)
+                .map(mapper::toDTO);
     }
 
     @Transactional
