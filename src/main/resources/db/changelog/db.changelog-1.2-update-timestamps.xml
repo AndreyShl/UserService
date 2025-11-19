@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+
+    <changeSet id="1-update-users-timestamps" author="andrei">
+        <sql>
+            ALTER TABLE users ALTER COLUMN created_at SET DATA TYPE timestamp;
+            ALTER TABLE users ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+            ALTER TABLE users ALTER COLUMN updated_at SET DATA TYPE timestamp;
+            ALTER TABLE users ALTER COLUMN updated_at SET DEFAULT CURRENT_TIMESTAMP;
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="2-update-payment-cards-timestamps" author="andrei">
+        <sql>
+            ALTER TABLE payment_cards ALTER COLUMN created_at SET DATA TYPE timestamp;
+            ALTER TABLE payment_cards ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+            ALTER TABLE payment_cards ALTER COLUMN updated_at SET DATA TYPE timestamp;
+            ALTER TABLE payment_cards ALTER COLUMN updated_at SET DEFAULT CURRENT_TIMESTAMP;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

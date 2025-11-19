@@ -1,0 +1,15 @@
+spring:
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${APP_DB_URL}
+    username: ${APP_DB_USERNAME}
+    password: ${APP_DB_PASSWORD}
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+
+
+  data:
+    redis:
+      host: redis
+      port: 6379
